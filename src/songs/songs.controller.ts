@@ -1,15 +1,24 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post, Put } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreateSongDTO } from './dto/create-song-dto';
 
 @Controller('songs')
 export class SongsController {
     constructor(private songsService: SongsService){}
+
     @Get()
     findAll(){
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return this.songsService.findAll();
+        //Exception handling in controller to provide the http status code and error message to front end
+        try{
+             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return this.songsService.findAll();
+        }catch( error ){
+            throw new HttpException('server error ',HttpStatus.INTERNAL_SERVER_ERROR, {cause: error});
+            console.log('found error while fetching the songs ',error)
+        }
+       
+        
     }
 
     @Get(':id')
