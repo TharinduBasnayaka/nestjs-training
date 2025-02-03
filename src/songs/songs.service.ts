@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { error } from 'node:console';
 
 @Injectable()
 export class SongsService {

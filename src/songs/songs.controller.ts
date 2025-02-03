@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreateSongDTO } from './dto/create-song-dto';
 
@@ -22,8 +22,8 @@ export class SongsController {
     }
 
     @Get(':id')
-    fetchSong(){
-        return 'fetch songs based on id';
+    fetchSong(@Param('id',new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE}))id: number ){
+        return 'fetch songs based on id: '+(typeof id);
     }
     
     @Put(':id')
