@@ -14,7 +14,7 @@ export class SongsService {
 
   findAll() {
     //handling errors
-    throw new Error('error coming from the db');
+    // throw new Error('error coming from the db');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return this.songs;
   }

@@ -4,11 +4,34 @@ import { AppService } from './app.service';
 import { SongsModule } from './songs/songs.module';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { SongsController } from './songs/songs.controller';
+import { DevConfigServices } from './common/providers/DevConfigServices';
 
+const devConfig = {
+  port: 3000,
+};
+const proConfig = {
+  port: 4000,
+};
 @Module({
   imports: [SongsModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    //this is a example of a class based providers
+    {
+      provide: DevConfigServices,
+      useClass: DevConfigServices,
+    },
+    //example ends
+    //example for factory provider
+    {
+      provide: 'CONFIG',
+      useFactory: () => {
+        return process.env.NODE_ENV === 'development' ? devConfig : proConfig;
+      },
+    },
+    //example ends
+  ],
 })
 export class AppModule implements NestModule {
   //using the logger middleware in the AppModule
