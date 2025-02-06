@@ -1,6 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 
-@Injectable()
+@Injectable({
+  scope: Scope.REQUEST,
+  // scope: Scope.TRANSIENT, //inejection scope example
+})
 export class SongsService {
   //creating local array for learning, till we connect a DB
 
