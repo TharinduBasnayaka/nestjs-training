@@ -1,10 +1,23 @@
-import { Injectable, Scope } from '@nestjs/common';
+import {
+  Injectable,
+  OnApplicationShutdown,
+  OnModuleInit,
+  Scope,
+} from '@nestjs/common';
 
 @Injectable({
-  scope: Scope.REQUEST,
+  scope: Scope.DEFAULT,
   // scope: Scope.TRANSIENT, //inejection scope example
 })
-export class SongsService {
+export class SongsService implements OnModuleInit, OnApplicationShutdown {
+  onApplicationShutdown(signal?: string) {
+    console.log(`OnApplicationShutdown hook executed ${signal}`);
+  }
+  onModuleInit() {
+    console.log(
+      'the songs module is intialized - printed from SongsService service',
+    );
+  }
   //creating local array for learning, till we connect a DB
 
   private readonly songs: any[] = [];

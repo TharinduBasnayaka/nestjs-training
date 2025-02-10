@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { SongsController } from './songs.controller';
 import { SongsService } from './songs.service';
-import { connection } from '../common/constants/connection';
+//import { connection } from '../common/constants/connection';
 
-const mockSongsService = {
-  findAll() {
-    return [{ id: 1, title: 'Animals' }];
-  },
-};
+// const mockSongsService = {
+//   findAll() {
+//     return [{ id: 1, title: 'Animals' }];
+//   },
+// };
 
 @Module({
   controllers: [SongsController],
@@ -31,7 +31,7 @@ const mockSongsService = {
   providers: [
     SongsService,
     //This is a example for non class based providers
-    { provide: 'CONNECTION', useValue: connection },
+    // { provide: 'CONNECTION', useValue: connection },
   ],
 })
 export class SongsModule {}

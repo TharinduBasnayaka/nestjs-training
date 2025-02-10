@@ -7,6 +7,7 @@ import { SongsController } from './songs/songs.controller';
 //import { DevConfigServices } from './common/providers/DevConfigServices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { Song } from './songs/song.entity';
 
 // const devConfig = {
 //   port: 3000,
@@ -17,6 +18,7 @@ import { DataSource } from 'typeorm';
 @Module({
   imports: [
     SongsModule,
+    //Establishing a connection with DB using TypeOrm
     TypeOrmModule.forRoot({
       type: 'postgres',
       database: 'spotify_clone',
@@ -24,7 +26,7 @@ import { DataSource } from 'typeorm';
       port: 5432,
       username: 'postgres',
       password: 'root',
-      entities: [],
+      entities: [Song],
       synchronize: true,
     }),
   ],
