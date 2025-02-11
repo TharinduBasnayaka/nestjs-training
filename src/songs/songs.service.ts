@@ -1,37 +1,69 @@
-import {
-  Injectable,
-  OnApplicationShutdown,
-  OnModuleInit,
-  Scope,
-} from '@nestjs/common';
+import { HttpCode, HttpStatus, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { DeleteResult, Repository } from 'typeorm';
+import { Song } from './song.entity';
+import { CreateSongDTO } from './dto/create-song-dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Console } from 'console';
 
-@Injectable({
-  scope: Scope.DEFAULT,
-  // scope: Scope.TRANSIENT, //inejection scope example
-})
-export class SongsService implements OnModuleInit, OnApplicationShutdown {
-  onApplicationShutdown(signal?: string) {
-    console.log(`OnApplicationShutdown hook executed ${signal}`);
-  }
+@Injectable()
+export class SongsService implements OnModuleInit {
   onModuleInit() {
     console.log(
       'the songs module is intialized - printed from SongsService service',
     );
   }
+  constructor(
+    @InjectRepository(Song) private songsRepository: Repository<Song>,
+  ) {}
   //creating local array for learning, till we connect a DB
-
   private readonly songs: any[] = [];
 
-  create(song: any) {
-    this.songs.push(song);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.songs;
+  async createSong(songDTO: CreateSongDTO): Promise<Song> {
+    const song = new Song();
+    song.title = songDTO.title;
+    song.artists = songDTO.artists;
+    song.duration = songDTO.duration;
+    song.releasedDate = songDTO.releaseDate;
+    song.lyrics = songDTO.lyrics;
+
+    return await this.songsRepository.save(song);
   }
 
-  findAll() {
+  async fetchAllSongs(): Promise<Song[]> {
     //handling errors
     // throw new Error('error coming from the db');
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.songs;
+    return await this.songsRepository.find();
   }
+
+  async fetchSong(id: number): Promise<Song | null> {
+    const song = await this.songsRepository.findOneBy({ id });
+
+    if (!song) {
+      throw new NotFoundException(
+        `Cannot perform the Fetch Operation, Cause:No record found for the passed song Id: ${id}`,
+      );
+    }
+
+    return song;
+  }
+
+  async deleteSong(id: number): Promise<object> {
+    const deletedResult = await this.songsRepository.delete(id);
+    if (deletedResult.affected === 0) {
+      throw new NotFoundException(
+        `Cannot perform the Delete Operation, Cause: No record found for the passed song Id: ${id}`,
+      );
+    } else {
+      const successObj = {
+        success: true,
+        message: 'successfully deleted the record',
+        httpStatusCode: HttpStatus.OK,
+      };
+      return successObj;
+    }
+  }
+
+  // async updateSong(id : number): Promise<Song | null>{
+
+  // }
 }

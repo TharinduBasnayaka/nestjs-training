@@ -5,16 +5,17 @@ GET http://localhost:3000
 GET http://localhost:3000/songs
 
 ###find a song request 
-GET http://localhost:3000/songs/1
+GET http://localhost:3000/songs/2
 
 ###Create new song request 
 POST http://localhost:3000/songs
 Content-Type: application/json
 
 {   "title":"Animals",
-    "artist":["maroon 5"],
+    "artists":["maroon 5"],
     "releaseDate":"2022-09-10",
-    "duration":"02:34"
+    "duration":"02:34",
+    "lyrics":""
 }
 
 ###Update song request 

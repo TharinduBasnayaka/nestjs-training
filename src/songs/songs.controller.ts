@@ -2,50 +2,63 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreateSongDTO } from './dto/create-song-dto';
+import { Song } from './song.entity';
+import { DeleteResult } from 'typeorm';
 
-
-//@Controller({path:'songs', scope: Scope.REQUEST})
 @Controller('Songs')
 export class SongsController {
-    // constructor(private songsService: SongsService, @Inject('CONNECTION') private connection: Connection){
-    //     console.log('connection string from the connection constant file ', this.connection.CONNECTION_STRING)
-    // }
-
+    
     constructor(private songsService : SongsService){}
 
+    @Post()
+    create(@Body() createSongDTO: CreateSongDTO): Promise<Song>{
+        try {
+            return this.songsService.createSong(createSongDTO);
+        } catch (error) {
+            throw new HttpException('server error ',HttpStatus.INTERNAL_SERVER_ERROR, {cause: error});
+        }
+       
+    }
+
     @Get()
-    findAll(){
-        //Exception handling in controller to provide the http status code and error message to front end
+    findAll(): Promise<Song[]>{
         try{
-             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            return this.songsService.findAll();
+            return this.songsService.fetchAllSongs();
         }catch( error ){
             throw new HttpException('server error ',HttpStatus.INTERNAL_SERVER_ERROR, {cause: error});
-            console.log('found error while fetching the songs ',error)
         }
        
         
     }
 
     @Get(':id')
-    fetchSong(@Param('id',new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE}))id: number ){
-        return 'fetch songs based on id: '+(typeof id);
+    fetchSong(@Param('id',new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE}))id: number ): Promise<Song | null> {
+        
+        try {
+            return this.songsService.fetchSong(id);
+        } catch (error) {
+            throw new HttpException('server error ',HttpStatus.INTERNAL_SERVER_ERROR, {cause: error});
+        }
     }
     
-    @Put(':id')
-    update(){
-        return 'update songs based on id';
-    }
+    // @Put(':id')
+    // update(@Param('id', new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE}))id: number): Promise<Song | null> {
+    //   try {
+    //     return this.songsService.updateSong(id);
+    //   } catch (error) {
+    //     throw new HttpException('server error ',HttpStatus.INTERNAL_SERVER_ERROR, {cause: error});
+    //   }
+    // }
 
-    @Post()
-    create(@Body() createSongDTO: CreateSongDTO){
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return this.songsService.create(createSongDTO);
-    }
+   
 
     @Delete(':id')
-    delete(){
-        return 'delete song based on id';
+    delete(@Param('id',new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE}))id: number ): Promise< object >{
+       try {
+            return this.songsService.deleteSong(id);
+       } catch (error) {
+            throw new HttpException('server error ',HttpStatus.INTERNAL_SERVER_ERROR, {cause: error});
+       }
     }
     
 }
