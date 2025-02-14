@@ -4,11 +4,12 @@ import {
   NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Song } from './song.entity';
 import { CreateSongDTO } from './dto/create-song-dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateSongDTO } from './dto/update-song-dto';
+import { Artist } from 'src/artists/artist.entity';
 
 @Injectable()
 export class SongsService implements OnModuleInit {
@@ -19,16 +20,28 @@ export class SongsService implements OnModuleInit {
   }
   constructor(
     @InjectRepository(Song) private songsRepository: Repository<Song>,
+    @InjectRepository(Artist) private artistsRepository: Repository<Artist>,
   ) {}
 
   //controller function for create song
   async createSong(songDTO: CreateSongDTO): Promise<Song> {
     const song = new Song();
     song.title = songDTO.title.toLowerCase();
-    song.artists = songDTO.artists;
     song.duration = songDTO.duration;
     song.releasedDate = songDTO.releaseDate;
     song.lyrics = songDTO.lyrics;
+
+    const artists = await this.artistsRepository.findBy({
+      id: In(songDTO.artists),
+    });
+
+    if (artists && artists.length >= 1) {
+      song.artists = artists;
+    } else {
+      throw new NotFoundException(
+        `Cannot add the song, Cause:No record found for the passed artist Ids: ${songDTO.artists}`,
+      );
+    }
 
     return await this.songsRepository.save(song);
   }
@@ -36,7 +49,17 @@ export class SongsService implements OnModuleInit {
   async fetchAllSongs(): Promise<Song[]> {
     //handling errors
     // throw new Error('error coming from the db');
-    return await this.songsRepository.find();
+    return await this.songsRepository.find({
+      relations: ['artists'],
+      select: {
+        id: true, // For Song
+        title: true,
+        artists: {
+          id: true,
+          artist_names: true, // Include artist id
+        },
+      },
+    });
   }
   //controller function for fetch song
   async fetchSongById(id: number): Promise<Song | null> {
@@ -51,9 +74,8 @@ export class SongsService implements OnModuleInit {
     return song;
   }
 
-  async fetchSongByName(title: string): Promise<Song | null> {
-    const song = await this.songsRepository.findOne({ where: { title } });
-    console.log(song);
+  async fetchSongByName(title: string): Promise<Song[] | null> {
+    const song = await this.songsRepository.find({ where: { title } });
     if (!song) {
       throw new NotFoundException(
         `Cannot perform the Fetch Operation, Cause:No record found for the passed song title : ${title}`,
