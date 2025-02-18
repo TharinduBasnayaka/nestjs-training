@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreateSongDTO } from './dto/create-song-dto';
 import { Song } from './song.entity';
@@ -23,6 +23,7 @@ export class SongsController {
     @Get()
     findAll(): Promise<Song[]>{
         try{
+        
             return this.songsService.fetchAllSongs();
         }catch( error ){
             throw new HttpException('server error ',HttpStatus.INTERNAL_SERVER_ERROR, {cause: error});
@@ -32,7 +33,7 @@ export class SongsController {
     }
 
     @Get(':id')
-    fetchSongById(@Param('id',new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE}))id: number ): Promise<Song | null> {
+    fetchSongById(@Param('id',new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE}))id: number ): Promise<Song[]> {
         
         try {
             return this.songsService.fetchSongById(id);

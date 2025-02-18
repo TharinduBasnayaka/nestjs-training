@@ -54,18 +54,35 @@ export class SongsService implements OnModuleInit {
       select: {
         id: true, // For Song
         title: true,
+        lyrics: true,
+        duration: true,
+        releasedDate: true,
         artists: {
-          id: true,
-          artist_names: true, // Include artist id
+          id: true, // Include artist id
+          artist_names: true,
         },
       },
     });
   }
   //controller function for fetch song
-  async fetchSongById(id: number): Promise<Song | null> {
-    const song = await this.songsRepository.findOneBy({ id });
+  async fetchSongById(id: number): Promise<Song[]> {
+    const song = await this.songsRepository.find({
+      where: { id },
+      relations: ['artists'],
+      select: {
+        id: true, // For Song
+        title: true,
+        lyrics: true,
+        duration: true,
+        releasedDate: true,
+        artists: {
+          id: true, // Include artist id
+          artist_names: true,
+        },
+      },
+    });
 
-    if (!song) {
+    if (!song || song.length === 0) {
       throw new NotFoundException(
         `Cannot perform the Fetch Operation, Cause:No record found for the passed song Id: ${id}`,
       );
@@ -74,14 +91,29 @@ export class SongsService implements OnModuleInit {
     return song;
   }
 
-  async fetchSongByName(title: string): Promise<Song[] | null> {
-    const song = await this.songsRepository.find({ where: { title } });
-    if (!song) {
+  async fetchSongByName(title: string): Promise<Song[]> {
+    const songs = await this.songsRepository.find({
+      where: { title },
+      relations: ['artists'],
+      select: {
+        id: true, // For Song
+        title: true,
+        lyrics: true,
+        duration: true,
+        releasedDate: true,
+        artists: {
+          id: true, // Include artist id
+          artist_names: true,
+        },
+      },
+    });
+
+    if (!songs || songs.length === 0) {
       throw new NotFoundException(
         `Cannot perform the Fetch Operation, Cause:No record found for the passed song title : ${title}`,
       );
     }
-    return song;
+    return songs;
   }
   //controller function for delete song
   async deleteSong(id: number): Promise<object> {
