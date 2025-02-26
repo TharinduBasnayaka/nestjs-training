@@ -10,6 +10,9 @@ import { DataSource } from 'typeorm';
 import { Song } from './songs/song.entity';
 import { Artist } from './artists/artist.entity';
 import { User } from './users/user.entity';
+import { PlaylistsController } from './playlists/playlists.controller';
+import { PlaylistsService } from './playlists/playlists.service';
+import { PlaylistsModule } from './playlists/playlists.module';
 
 // const devConfig = {
 //   port: 3000,
@@ -31,10 +34,12 @@ import { User } from './users/user.entity';
       entities: [Song, Artist, User],
       synchronize: true,
     }),
+    PlaylistsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, PlaylistsController],
   providers: [
     AppService,
+    PlaylistsService,
     //this is a example of a class based providers
     // {
     //   provide: DevConfigServices,
